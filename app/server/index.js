@@ -35,6 +35,7 @@ const checkTUPCIDExists = (TUPCID, table) => {
   });
 };
 
+
 // FOR STUDENT REGISTRATION
 app.post('/studreg', (req, res) => {
   const {
@@ -443,92 +444,54 @@ app.put('/admin/:TUPCID', (req, res) => {
 // LOGIN
 app.post('/login', (req, res) => {
   const { TUPCID, PASSWORD } = req.body;
+  let accountType = '';
 
-  // Find the user account in the respective tables (student_accounts, faculty_accounts, admin_accounts)
-  const checkLogin = (table) => {
-    return new Promise((resolve, reject) => {
-      const query = `SELECT TUPCID, PASSWORD FROM ${table} WHERE TUPCID = ?`;
-      connection.query(query, [TUPCID], (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result[0]);
-        }
-      });
-    });
-  };
-
-  // Check for the account in student_accounts table
-  checkLogin('student_accounts')
-    .then((student) => {
-      if (student) {
-        bcryptjs.compare(PASSWORD, student.PASSWORD, (err, isMatch) => {
-          if (err) {
-            console.error('Error comparing passwords:', err);
-            return res.status(500).send({ message: 'Server error' });
-          }
-
-          if (isMatch) {
-            return res.status(200).send({ accountType: 'student' });
-          } else {
-            return res.status(401).send({ message: 'Password is incorrect' });
-          }
-        });
+  checkLogin('student_accounts', TUPCID, PASSWORD, 'student')
+    .then((result) => {
+      if (result.accountType) {
+        accountType = result.accountType;
       } else {
-        // Check for the account in faculty_accounts table
-        checkLogin('faculty_accounts')
-          .then((faculty) => {
-            if (faculty) {
-              bcryptjs.compare(PASSWORD, faculty.PASSWORD, (err, isMatch) => {
-                if (err) {
-                  console.error('Error comparing passwords:', err);
-                  return res.status(500).send({ message: 'Server error' });
-                }
-
-                if (isMatch) {
-                  return res.status(200).send({ accountType: 'faculty' });
-                } else {
-                  return res.status(401).send({ message: 'Password is incorrect' });
-                }
-              });
-            } else {
-              // Check for the account in admin_accounts table
-              checkLogin('admin_accounts')
-                .then((admin) => {
-                  if (admin) {
-                    bcryptjs.compare(PASSWORD, admin.PASSWORD, (err, isMatch) => {
-                      if (err) {
-                        console.error('Error comparing passwords:', err);
-                        return res.status(500).send({ message: 'Server error' });
-                      }
-
-                      if (isMatch) {
-                        return res.status(200).send({ accountType: 'admin' });
-                      } else {
-                        return res.status(401).send({ message: 'Password is incorrect' });
-                      }
-                    });
-                  } else {
-                    // Account not found in any of the tables
-                    return res.status(404).send({ message: 'Account does not exist' });
-                  }
-                })
-                .catch((err) => {
-                  console.error('Error checking login in the database:', err);
-                  return res.status(500).send({ message: 'Database error' });
-                });
-            }
-          })
-          .catch((err) => {
-            console.error('Error checking login in the database:', err);
-            return res.status(500).send({ message: 'Database error' });
-          });
+        return checkLogin('faculty_accounts', TUPCID, PASSWORD, 'faculty');
       }
+    })
+    .then((result) => {
+      if (result.accountType) {
+        accountType = result.accountType;
+      } else {
+        // Account not found in any of the tables
+        return res.status(404).send({ message: 'Account does not exist' });
+      }
+    })
+    .then(() => {
+      return res.status(200).send({ accountType });
     })
     .catch((err) => {
       console.error('Error checking login in the database:', err);
       return res.status(500).send({ message: 'Database error' });
     });
+});
+
+
+app.post('/adminlogin', (req, res) => {
+  const { adminName } = req.body;
+
+  // Check if the adminName exists in the admin_accounts table
+  const query = 'SELECT * FROM admin_accounts WHERE ADMINNAME = ?';
+  connection.query(query, [adminName], (err, result) => {
+    if (err) {
+      console.error('Error fetching admin account:', err);
+      return res.status(500).send({ message: 'Database error' });
+    }
+
+    if (result.length === 0) {
+      // AdminName not found in the database
+      return res.status(404).send({ isAuthenticated: false });
+    }
+
+    // AdminName found, admin is authenticated
+    // In a production scenario, you may want to generate a secure token here and use it to authenticate the user
+    return res.status(200).send({ isAuthenticated: true, adminName: result[0].ADMINNAME });
+  });
 });
 
 
