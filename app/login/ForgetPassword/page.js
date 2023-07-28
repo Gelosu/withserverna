@@ -1,17 +1,16 @@
 import Footer from "@/components/DefaultFix/Footer";
 import NavBar from "@/components/DefaultFix/NavBar";
-import UpdatePassword from "@/components/ForgetPassword/UPassword";
+import ForgotPassword from "@/components/ForgetPassword/FPassword";
 
-export default function UpdatePasswordPage() {
+export default function ForgetPasswordPage() {
   return (
     <main className="d-flex justify-content-between flex-column vh-100">
       <div>
         <NavBar />
       </div>
       <section>
-        <UpdatePassword />
+        <ForgotPassword />
       </section>
-
       <div>
         <Footer />
       </div>

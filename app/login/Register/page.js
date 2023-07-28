@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import Footer from "@/components/DefaultFix/Footer";
 import NavBar from "@/components/DefaultFix/NavBar";
 import FacultyRegister from "@/components/LoginPage/FacultyRegister";
@@ -17,18 +17,23 @@ export default function RegisterPage() {
   };
 
   return (
-    <main>
-      <NavBar />
+    <main className="d-flex flex-column justify-content-between vh-100">
+      <div>
+        <NavBar />
+      </div>
+
       <div>
         {studentbtn ? (
           <StudentRegister />
         ) : facultybtn ? (
           <FacultyRegister />
         ) : (
-          <PositionOPT SClick = {StudentClick} FClick = {FacultyClick}/>
+          <PositionOPT SClick={StudentClick} FClick={FacultyClick} />
         )}
       </div>
-      <Footer />
+      <div>
+        <Footer />
+      </div>
     </main>
   );
 }

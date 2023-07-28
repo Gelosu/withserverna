@@ -59,8 +59,8 @@ export default function Login() {
   };
 
   return (
-    <main className="container vh-100 d-flex justify-content-center align-items-center">
-      <section className="col-lg-5 d-flex justify-content-center align-items-center flex-column border border-dark h-50 rounded-3">
+    <main className="container d-flex justify-content-center align-items-center">
+      <section className="col-lg-5 py-5 d-flex justify-content-center align-items-center flex-column border border-dark h-50 rounded-3">
         <form
           className="d-flex justify-content-center align-items-center flex-column col-12"
           onSubmit={handleSubmit(submitForm)}
@@ -94,14 +94,14 @@ export default function Login() {
             LOGIN
           </button>
         </form>
-        <button
+        <a
           type="button"
-          className="link-primary mb-3 btn btn-link"
+          className="link-primary mb-3 btn btn-link text-decoration-none"
           onClick={handleAdminLinkClick}
         >
           Are you an admin? Click here
-        </button>
-        <a className="link-primary mb-3 text-decoration-none" href="/">
+        </a>
+        <a className="link-primary mb-3 text-decoration-none" href="/login/ForgetPassword">
           Forgot Password?
         </a>
         <p className="text-center px-lg-2 px-4">

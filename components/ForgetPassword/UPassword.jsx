@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function UpdatePassword() {
     return (
-      <main className="container-sm vh-100 d-flex justify-content-center align-items-center">
+      <main className="container-sm d-flex justify-content-center align-items-center">
         <section className="col-sm-5 border border-dark rounded p-3 py-5">
           <p className="text-center fs-5 fw-bold">FORGOT PASSWORD</p>
           <form className="row gap-3 justify-content-center">

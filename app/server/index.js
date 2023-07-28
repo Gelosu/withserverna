@@ -6,6 +6,9 @@ const expressSession = require('express-session');
 const cookieParser = require('cookie-parser');
 const connection = require('./db');
 const bcryptjs = require('bcryptjs');
+const uuid = require('uuid'); // Import the uuid library for generating unique codes
+const nodemailer = require('nodemailer'); // Import nodemailer for sending emails
+
 
 const app = express();
 
@@ -22,17 +25,14 @@ app.use(passport.session());
 require('./passportConfig')(passport);
 
 // Check if the TUPCID already exists in the database for both students and faculty
-const checkTUPCIDExists = (TUPCID, table) => {
-  return new Promise((resolve, reject) => {
+const checkTUPCIDExists = async (TUPCID, table) => {
+  try {
     const query = `SELECT TUPCID FROM ${table} WHERE TUPCID = ?`;
-    connection.query(query, [TUPCID], (err, result) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(result.length > 0);
-      }
-    });
-  });
+    const [rows] = await connection.query(query, [TUPCID]);
+    return rows.length > 0;
+  } catch (error) {
+    throw error;
+  }
 };
 
 
@@ -493,6 +493,117 @@ app.post('/adminlogin', (req, res) => {
     return res.status(200).send({ isAuthenticated: true, adminName: result[0].ADMINNAME });
   });
 });
+
+
+
+//passwordreset
+
+
+
+// Send email to GSFE Account
+const sendEmailToGSFEAccount = (GSFEACC, code) => {
+  // Replace these placeholders with your actual email service credentials and settings
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'eos2022to2023@gmail.com',
+      pass: 'ujfshqykrtepqlau',
+    },
+  });
+
+  const mailOptions = {
+    from: 'eos2022to2023@gmail.com',
+    to: GSFEACC,
+    subject: 'Forgot Password Code',
+    text: `Your unique code for password reset is: ${code}`,
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error('Error sending email:', err);
+    } else {
+      console.log('Email sent:', info.response);
+    }
+  });
+};
+
+// Generate unique code, store it in the database, and send it to the registered GSFE account via email
+const generateAndSendCode = async (TUPCID, GSFEACC) => {
+  try {
+    // Generate unique code using UUID library
+    const code = uuid.v4();
+
+    // Store the code in the database along with TUPCID and GSFEACC
+    const query = 'INSERT INTO passwordreset_accounts (TUPCID, GSFEACC, code) VALUES (?, ?, ?)';
+    await connection.query(query, [TUPCID, GSFEACC, code]);
+
+    // Send the code to the registered GSFE account via email
+    sendEmailToGSFEAccount(GSFEACC, code);
+  } catch (err) {
+    console.error('Error generating and sending code:', err);
+  }
+};
+
+// FORGOT PASSWORD
+app.post('/forgotpassword', async (req, res) => {
+  const { TUPCID, GSFEACC } = req.body;
+
+  // Helper function to check if the TUPCID exists in the specified table
+  const checkTUPCIDExists = async (TUPCID, table) => {
+    try {
+      const query = `SELECT TUPCID FROM ${table} WHERE TUPCID = ?`;
+      const [rows] = await connection.query(query, [TUPCID]);
+      return rows.length > 0;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  // Helper function to generate unique code, store it in the database, and send it to the provided GSFEACC
+  const generateAndSendCode = async (TUPCID, GSFEACC) => {
+    try {
+      // Generate unique code using UUID library
+      const code = uuid.v4();
+
+      // Store the code in the database along with TUPCID and GSFEACC
+      const query = 'INSERT INTO passwordreset_accounts (TUPCID, GSFEACC, code) VALUES (?, ?, ?)';
+      await connection.query(query, [TUPCID, GSFEACC, code]);
+
+      // Send the code to the registered GSFE account via email
+      sendEmailToGSFEAccount(GSFEACC, code);
+
+      // Send the response back to the client
+      return res.status(200).send({ message: 'Code sent to GSFE Account' });
+    } catch (err) {
+      console.error('Error generating and sending code:', err);
+      return res.status(500).send({ message: 'Failed to generate and send code' });
+    }
+  };
+
+  // Check if the TUPCID exists in the student_accounts table
+  checkTUPCIDExists(TUPCID, 'student_accounts')
+    .then((existsInStudents) => {
+      if (!existsInStudents) {
+        // If not found in student_accounts, check in faculty_accounts
+        return checkTUPCIDExists(TUPCID, 'faculty_accounts');
+      } else {
+        return true; // TUPCID exists in student_accounts
+      }
+    })
+    .then((existsInFaculty) => {
+      if (!existsInFaculty) {
+        return res.status(404).send({ message: 'TUPCID does not exist' });
+      } else {
+        // TUPCID exists, generate unique code, store it in the database, and send it to the GSFE account
+        return generateAndSendCode(TUPCID, GSFEACC);
+      }
+    })
+    .catch((err) => {
+      console.error('Error checking TUPCID in the database:', err);
+      return res.status(500).send({ message: 'Failed to check TUPCID in the database' });
+    });
+});
+
 
 
 

@@ -29,7 +29,7 @@ export default function FacultyClassTest() {
     setTest([]);
   };
   return (
-    <main className="custom-h col-11 col-md-10 p-0">
+    <main className="col-11 col-md-10 p-0">
       <section className="container-fluid p-sm-4 py-3 ">
         <h3 className="d-flex align-items-center gap-2 text-decoration-none link-dark">
           <a href="/Classroom/F" className="align-self-center pb-1">

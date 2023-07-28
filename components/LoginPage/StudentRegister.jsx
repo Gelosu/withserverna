@@ -3,12 +3,13 @@ import { useState } from "react";
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import {useRouter} from 'next/navigation';
 
 export default function StudentRegister() {
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const gsfeRegExp = /@gsfe.tupcavite.edu.ph/;
   const tupcRegExp = /TUPC-\d{2}-\d{4}$/;
-
   const schema = yup.object().shape({
     TUPCID: yup.string().matches(tupcRegExp, 'Invalid TUPC-ID!'),
     SURNAME: yup.string().required('Surname is Required!'),
@@ -37,6 +38,7 @@ export default function StudentRegister() {
         // Student registration successful, redirect or show success message
         console.log("Student registered successfully!");
         // Redirect or show a success message to the user
+        //router.push("/login")
       } else {
         // Something went wrong with the registration
         console.log("An error occurred while registering student.");
@@ -53,7 +55,7 @@ export default function StudentRegister() {
   };
 
   return (
-    <main className="container-sm vh-100 d-flex justify-content-center align-items-center flex-column">
+    <main className="container-sm py-sm-5 py-3 d-flex justify-content-center align-items-center flex-column">
       <p className="mb-0 fw-bold fs-5 ">STUDENT REGISTRATION</p>
       <section className="container-sm col-lg-6 py-3 px-4 border border-dark rounded">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -61,42 +63,42 @@ export default function StudentRegister() {
             <p className="col-sm-6 my-1 text-sm-start text-center">TUPC ID</p>
             <input
               type="text"
-              className="col-sm-6 rounded border border-dark text-sm-start text-center"
+              className="col-sm-6 rounded py-1 px-3 border border-dark text-sm-start text-center"
               {...register('TUPCID')}
             />
-            <small className="text-end text-danger">{errors.TUPCID?.message}</small>
+            <small className="text-sm-end text-center text-danger">{errors.TUPCID?.message}</small>
           </div>
           <div className="row p-sm-2 px-3">
             <p className="col-sm-6 my-1 text-sm-start text-center">SURNAME</p>
             <input
               type="text"
-              className="col-sm-6 rounded border border-dark text-sm-start text-center"
+              className="col-sm-6 rounded py-1 px-3 border border-dark text-sm-start text-center"
               {...register('SURNAME')}
             />
-            <small className="text-end text-danger">{errors.SURNAME?.message}</small>
+            <small className="text-sm-end text-center text-danger">{errors.SURNAME?.message}</small>
           </div>
           <div className="row p-sm-2 px-3">
             <p className="col-sm-6 my-1 text-sm-start text-center">FIRST NAME</p>
             <input
               type="text"
-              className="col-sm-6 rounded border border-dark text-sm-start text-center"
+              className="col-sm-6 rounded py-1 px-3 border border-dark text-sm-start text-center"
               {...register('FIRSTNAME')}
             />
-            <small className="text-end text-danger">{errors.FIRSTNAME?.message}</small>
+            <small className="text-sm-end text-center text-danger">{errors.FIRSTNAME?.message}</small>
           </div>
           <div className="row p-sm-2 px-3">
             <p className="col-sm-6 my-1 text-sm-start text-center">GSFE ACCOUNT</p>
             <input
               type="text"
-              className="col-sm-6 rounded border border-dark text-sm-start text-center"
+              className="col-sm-6 rounded py-1 px-3 border border-dark text-sm-start text-center"
               {...register('GSFEACC')}
             />
-            <small className="text-end text-danger">{errors.GSFEACC?.message}</small>
+            <small className="text-sm-end text-center text-danger">{errors.GSFEACC?.message}</small>
           </div>
           <div className="row p-sm-2 px-3">
             <p className="col-sm-6 my-1 text-sm-start text-center">COURSE</p>
             <select
-              className="col-sm-6 rounded border border-dark text-sm-start text-center "
+              className="col-sm-6 rounded py-1 px-3 border border-dark text-sm-start text-center "
               {...register('COURSE')}
               id="inputGroupSelect2"
             >
@@ -106,12 +108,12 @@ export default function StudentRegister() {
               <option value="ETECH">ETECH</option>
               <option value="MT">MT</option>
             </select>
-            <small className="text-end text-danger">{errors.COURSE?.message}</small>
+            <small className="text-sm-end text-center text-danger">{errors.COURSE?.message}</small>
           </div>
           <div className="row p-sm-2 px-3">
             <p className="col-sm-6 my-1 text-sm-start text-center">YEAR</p>
             <select
-              className="col-sm-6 rounded border border-dark text-sm-start text-center"
+              className="col-sm-6 rounded py-1 px-3 border border-dark text-sm-start text-center"
               {...register('YEAR')}
               id="inputGroupSelect3"
             >
@@ -121,12 +123,12 @@ export default function StudentRegister() {
               <option value="3RD">3RD</option>
               <option value="4TH">4TH</option>
             </select>
-            <small className="text-end text-danger">{errors.YEAR?.message}</small>
+            <small className="text-sm-end text-center text-danger">{errors.YEAR?.message}</small>
           </div>
           <div className="row p-sm-2 px-3">
             <p className="col-sm-6 my-1 text-sm-start text-center">STATUS</p>
             <select
-              className="col-sm-6 rounded border border-dark text-sm-start text-center"
+              className="col-sm-6 rounded py-1 px-3 border border-dark text-sm-start text-center"
               {...register('STATUS')}
               id="inputGroupSelect1"
             >
@@ -134,19 +136,19 @@ export default function StudentRegister() {
               <option value="REGULAR">REGULAR</option>
               <option value="IRREGULAR">IRREGULAR</option>
             </select>
-            <small className="text-end text-danger">{errors.STATUS?.message}</small>
+            <small className="text-sm-end text-center text-danger">{errors.STATUS?.message}</small>
           </div>
           <div className="row p-sm-2 px-3">
             <p className="col-sm-6 my-1 text-sm-start text-center">PASSWORD</p>
             <input
               type="password"
-              className="col-sm-6 rounded border border-dark text-sm-start text-center"
+              className="col-sm-6 rounded py-1 px-3 border border-dark text-sm-start text-center"
               {...register('PASSWORD')}
             />
-            <small className="text-end text-danger">{errors.PASSWORD?.message}</small>
+            <small className="text-sm-end text-center text-danger">{errors.PASSWORD?.message}</small>
           </div>
           <div className="text-center py-2">
-        {errorMessage && <p className="text-danger">{errorMessage}</p>}
+        {errorMessage && <small className="text-danger">{errorMessage}</small>}
         <button className="text-center px-3 py-1 btn btn-outline-dark" type="submit">
           SUBMIT
         </button>
